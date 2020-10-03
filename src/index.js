@@ -1,22 +1,21 @@
+import $ from 'jquery';
 import './index.scss';
-import guardianApi from './api';
 import Loader from './loader/loader';
+import { searchNews, getNewsItem } from './requests';
 
-const refreshBtn = document.getElementById('refresh_btn');
-const newsList = document.getElementById('news_list');
-const newsWrap = document.querySelector('.news-wrap');
+const refreshBtn = $('#refresh_btn');
+const newsList = $('#news_list');
+const newsWrap = $('.news-wrap');
 
-const loader = new Loader(newsWrap);
-
-async function searchNews(query = '') {
-  const response = await guardianApi.get(`/search?q=${query}`);
-
-  return response.results;
-}
+const loader = new Loader(newsWrap[0]);
 
 function renderNews(news) {
   return news
-    .map(({ webTitle }) => `<li class="news-list__item">${webTitle}</li>`)
+    .map(({ webTitle, id }) => `
+      <li class="news-list__item" data-id="${id}">
+        <h4 class="news-list__title">${webTitle}</h4>
+      </li>
+    `)
     .join('');
 }
 
@@ -26,9 +25,9 @@ async function displayNews() {
   try {
     const news = await searchNews();
 
-    newsList.innerHTML = renderNews(news);
+    newsList.html(renderNews(news));
   } catch (e) {
-    newsList.innerHTML = `<div class="error">${e.message}</div>`;
+    newsList.html(`<div class="error">${e.message}</div>`);
   }
 
   loader.stop();
@@ -36,4 +35,37 @@ async function displayNews() {
 
 displayNews();
 
-refreshBtn.addEventListener('click', () => displayNews());
+refreshBtn.on('click', () => displayNews());
+
+newsList.on('click', async (e) => {
+  const newsTitle = e.target.closest('.news-list__title');
+
+  if (!newsTitle) {
+    return;
+  }
+
+  const newsItem = newsTitle.closest('.news-list__item');
+
+  const getNewsBody = () => $(newsItem).find('.news-list__body')[0];
+  const newsBody = getNewsBody();
+
+  if (newsBody) {
+    $(newsBody).slideToggle();
+    return;
+  }
+
+  const { id } = newsItem.dataset;
+
+  const content = await getNewsItem(id);
+
+  const { body } = content.fields;
+
+  newsItem.insertAdjacentHTML('beforeend', `
+    <div class="news-list__body">${body}</div>
+  `);
+
+  const addedBody = getNewsBody();
+
+  $(addedBody).hide();
+  $(addedBody).slideToggle();
+});
