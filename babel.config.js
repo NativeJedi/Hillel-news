@@ -3,8 +3,11 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-          useBuiltIns: 'usage',
+        useBuiltIns: 'usage',
       },
     ],
+  ],
+  plugins: [
+    '@babel/plugin-proposal-class-properties',
   ],
 };

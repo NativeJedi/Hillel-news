@@ -20,6 +20,7 @@
   "homepage": "https://github.com/NativeJedi/Hillel-group#readme",
   "devDependencies": {
     "@babel/core": "^7.11.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
@@ -39,6 +40,9 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.10.4"
+    "@babel/polyfill": "^7.10.4",
+    "axios": "^0.20.0",
+    "jquery": "^3.5.1",
+    "spin.js": "^4.1.0"
   }
 }
