@@ -5,7 +5,6 @@ class Loader {
   loader = {};
 
   constructor(target) {
-    console.log(target);
     this.target = target;
 
     this.loader = new Spinner();

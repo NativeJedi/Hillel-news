@@ -61,11 +61,10 @@ newsList.on('click', async (e) => {
   const { body } = content.fields;
 
   newsItem.insertAdjacentHTML('beforeend', `
-    <div class="news-list__body">${body}</div>
+    <div class="news-list__body" style="display: none">${body}</div>
   `);
 
   const addedBody = getNewsBody();
 
-  $(addedBody).hide();
   $(addedBody).slideToggle();
 });
