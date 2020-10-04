@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import './index.scss';
 import Loader from './loader/loader';
+import Pagination from './pagination/pagination';
 import { searchNews, getNewsItem } from './requests';
 
 const refreshBtn = $('#refresh_btn');
@@ -23,9 +24,13 @@ async function displayNews() {
   loader.start();
 
   try {
-    const news = await searchNews();
+    const response = await searchNews();
+    const { total, currentPage, results } = response;
 
-    newsList.html(renderNews(news));
+    const pagination = new Pagination(total, currentPage, newsWrap);
+    pagination.onInput = (page) => searchNews(page);
+
+    newsList.html(renderNews(results));
   } catch (e) {
     newsList.html(`<div class="error">${e.message}</div>`);
   }

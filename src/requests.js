@@ -1,9 +1,7 @@
 import guardianApi from './api';
 
-export async function searchNews(query = '') {
-  const response = await guardianApi.get(`/search?q=${query}`);
-
-  return response.results;
+export async function searchNews(page = 1, query = '') {
+  return guardianApi.get(`/search?page=${page}&q=${query}`);
 }
 
 export async function getNewsItem(apiUrl) {
