@@ -1,72 +1,64 @@
-import './pagination.scss';
 import $ from 'jquery';
 
-export default class Pagination {
+class Pagination {
   #currentPage = 1;
 
-  total = 1;
+  pages = 1;
+
+  onChange = () => {};
 
   get currentPage() {
     return this.#currentPage;
   }
 
   set currentPage(page) {
-    const pageNum = Number(page);
+    const pageNumber = Number(page);
 
-    if (!pageNum || pageNum < 1) {
+    if (!pageNumber || pageNumber < 1 || pageNumber > this.pages) {
       this.#currentPage = 1;
       return;
     }
 
-    if (pageNum > this.totalPages) {
-      this.#currentPage = this.total;
-      return;
-    }
-
-    this.#currentPage = pageNum;
+    this.#currentPage = page;
   }
 
-  constructor(total, currentPage, target, onInput) {
-    this.total = total;
-    this.currentPage = currentPage;
-    this.target = target;
-    this.onInput = onInput || function defaultInput() {};
+  constructor(currentPage, pages, output) {
+    this.output = output;
+    this.#currentPage = currentPage;
+    this.pages = pages;
+
     this.render();
   }
 
   async handlePageChange(page) {
-    const { currentPage, total } = await this.onInput(page);
-    this.currentPage = currentPage;
-    this.total = total;
+    this.currentPage = page;
+    const { pages } = await this.onChange(this.currentPage);
+    this.pages = pages;
+
     this.render();
   }
 
   render() {
-    const markup = `
+    $('.pagination').remove();
+
+    this.output.insertAdjacentHTML('beforeend', `
       <div class="pagination">
-        <button class="pagination__btn pagination__btn--prev">&#10094;</button>
-        <div class="pagination__input-wrap">
+        <button class="pagination__btn pagination__btn--prev">Prev</button>
+        <div>
           <input class="pagination__input" type="text" value="${this.currentPage}">
-          <span class="pagination__count">of ${this.total}</span>
+          of
+          <span>${this.pages}</span>
         </div>
-        <button class="pagination__btn pagination__btn--next">&#10095;</button>
+        <button class="pagination__btn pagination__btn--next">Next</button>
       </div>
-    `;
+    `);
 
-    $(this.target).find('.pagination').remove();
-    $(this.target).append(markup);
+    $('.pagination__btn--next').on('click', () => this.handlePageChange(this.currentPage + 1));
 
-    $('.pagination__input').on('blur', (e) => this.handlePageChange(e.target.value));
-    $('.pagination__btn--next').on('click', () => {
-      this.currentPage += 1;
+    $('.pagination__btn--prev').on('click', () => this.handlePageChange(this.currentPage - 1));
 
-      this.handlePageChange(this.currentPage);
-    });
-
-    $('.pagination__btn--prev').on('click', () => {
-      this.currentPage -= 1;
-
-      this.handlePageChange(this.currentPage);
-    });
+    $('.pagination__input').on('blur', async (e) => this.handlePageChange(e.target.value));
   }
 }
+
+export default Pagination;
