@@ -4,6 +4,8 @@ import $ from 'jquery';
 export default class Pagination {
   #currentPage = 1;
 
+  total = 1;
+
   get currentPage() {
     return this.#currentPage;
   }
@@ -17,15 +19,15 @@ export default class Pagination {
     }
 
     if (pageNum > this.totalPages) {
-      this.#currentPage = this.totalPages;
+      this.#currentPage = this.total;
       return;
     }
 
     this.#currentPage = pageNum;
   }
 
-  constructor(pages, currentPage, target, onInput) {
-    this.totalPages = pages;
+  constructor(total, currentPage, target, onInput) {
+    this.total = total;
     this.currentPage = currentPage;
     this.target = target;
     this.onInput = onInput || function defaultInput() {};
@@ -33,21 +35,21 @@ export default class Pagination {
   }
 
   async handlePageChange(page) {
-    const { currentPage, pages } = await this.onInput(page);
+    const { currentPage, total } = await this.onInput(page);
     this.currentPage = currentPage;
-    this.totalPages = pages;
+    this.total = total;
     this.render();
   }
 
   render() {
     const markup = `
       <div class="pagination">
-        <button class="pagination__btn pagination__btn--prev">Prev</button>
+        <button class="pagination__btn pagination__btn--prev">&#10094;</button>
         <div class="pagination__input-wrap">
           <input class="pagination__input" type="text" value="${this.currentPage}">
-          <span class="pagination__count">of ${this.totalPages}</span>
+          <span class="pagination__count">of ${this.total}</span>
         </div>
-        <button class="pagination__btn pagination__btn--next">Next</button>
+        <button class="pagination__btn pagination__btn--next">&#10095;</button>
       </div>
     `;
 
